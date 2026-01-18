@@ -58,7 +58,7 @@ bool dps310_read_temp(dps310_t *dps310, float *temp) {
     tempRaw = dps310_read_s24(&bufferTemp[DPS310_TEMP_HB_I]);
 
     // Scale raw values
-    tempRawSc = tempRaw / (float)dps310->tempOversampleSf;
+    tempRawSc = (float)tempRaw / (float)dps310->tempOversampleSf;
 
     // Store the measurement into the struct for the pressure calculation
     dps310->lastTempRawSc = tempRawSc;
@@ -97,7 +97,7 @@ bool dps310_read_pres(dps310_t *dps310, float *pres, bool readNewTemp) {
     presRaw = dps310_read_s24(&bufferPres[DPS310_PRES_HB_I]);
 
     // Scale raw values
-    presRawSc = presRaw / (float)dps310->presOversampleSf;
+    presRawSc = (float)presRaw / (float)dps310->presOversampleSf;
 
     // Apply compensation
     if (pres) {
@@ -130,7 +130,7 @@ bool dps310_fifo_read(dps310_t *dps310, float *value, dps310_MeasType_t *measTyp
         if (!dps310->lastTempInit)
             return false;
 
-        float presRawSc = rawValue / (float)dps310->presOversampleSf;
+        float presRawSc = (float)rawValue / (float)dps310->presOversampleSf;
         float presComp = dps310_compensate_pres(dps310, presRawSc, dps310->lastTempRawSc);
         if (value)
             *value = presComp;
@@ -139,7 +139,7 @@ bool dps310_fifo_read(dps310_t *dps310, float *value, dps310_MeasType_t *measTyp
     }
     // Temperature measurement
     else {
-        float tempRawSc = rawValue / (float)dps310->tempOversampleSf;
+        float tempRawSc = (float)rawValue / (float)dps310->tempOversampleSf;
 
         dps310->lastTempRawSc = tempRawSc;
         dps310->lastTempInit = true;

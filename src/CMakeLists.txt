@@ -13,3 +13,10 @@ target_link_libraries(sensor_dps310 PUBLIC
     pico_stdlib
     hardware_i2c
 )
+
+target_compile_options(sensor_dps310 PRIVATE
+    -Wall
+    -Wextra
+    -Wshadow
+    -Wconversion
+)
