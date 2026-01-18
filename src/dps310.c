@@ -770,7 +770,7 @@ bool dps310_read_block(const dps310_t *dps310, uint8_t startReg, uint8_t data[],
     return true;
 }
 
-static inline bool dps310_set_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t value) {
+extern inline bool dps310_set_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t value) {
     uint8_t buffer;
 
     if (!dps310_read_register(dps310, reg, &buffer))
@@ -785,7 +785,7 @@ static inline bool dps310_set_mask(const dps310_t *dps310, uint8_t reg, uint8_t 
     return true;
 }
 
-static inline bool dps310_read_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t *value) {
+extern inline bool dps310_read_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t *value) {
     uint8_t buffer;
 
     if (!dps310_read_register(dps310, reg, &buffer))
@@ -795,7 +795,7 @@ static inline bool dps310_read_mask(const dps310_t *dps310, uint8_t reg, uint8_t
     return true;
 }
 
-static inline bool dps310_set_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool value) {
+extern inline bool dps310_set_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool value) {
     uint8_t buffer;
 
     if (!dps310_read_register(dps310, reg, &buffer))
@@ -811,7 +811,7 @@ static inline bool dps310_set_bit(const dps310_t *dps310, uint8_t reg, uint8_t m
     return true;
 }
 
-static inline bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool *value) {
+extern inline bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool *value) {
     uint8_t buffer;
 
     if (!dps310_read_register(dps310, reg, &buffer))
@@ -825,7 +825,7 @@ static inline bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t 
     return true;
 }
 
-static inline int32_t dps310_read_s24(const uint8_t *buf) {
+extern inline int32_t dps310_read_s24(const uint8_t *buf) {
     uint32_t raw;
     int32_t rawInt;
 
@@ -838,7 +838,7 @@ static inline int32_t dps310_read_s24(const uint8_t *buf) {
     return rawInt;
 }
 
-static inline float dps310_compensate_pres(const dps310_t *dps310, float presRawSc,
+extern inline float dps310_compensate_pres(const dps310_t *dps310, float presRawSc,
                                            float tempRawSc) {
     return (float)dps310->presCoef.c00 +
            presRawSc * ((float)dps310->presCoef.c10 +
@@ -847,11 +847,11 @@ static inline float dps310_compensate_pres(const dps310_t *dps310, float presRaw
            tempRawSc * presRawSc * (dps310->presCoef.c11 + presRawSc * dps310->presCoef.c21);
 }
 
-static inline float dps310_compensate_temp(const dps310_t *dps310, float tempRawSc) {
+extern inline float dps310_compensate_temp(const dps310_t *dps310, float tempRawSc) {
     return dps310->tempCoef.c0Half + dps310->tempCoef.c1 * tempRawSc;
 }
 
-static inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t oversample) {
+extern inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t oversample) {
     switch (oversample) {
         case DPS310_OVERSAMPLING_1_TIME:
             return DPS310_OVERSAMPLING_1_TIME_SF;
@@ -875,7 +875,7 @@ static inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t o
     }
 }
 
-static inline int32_t dps310_sign_extend(uint32_t value, int bits) {
+extern inline int32_t dps310_sign_extend(uint32_t value, int bits) {
     if (value & (1U << (bits - 1))) {
         value |= ~((1U << bits) - 1); // llena los bits altos con 1
     }

@@ -310,24 +310,24 @@ bool dps310_read_register(const dps310_t *dps310, uint8_t reg, uint8_t *data);
 bool dps310_write_block(const dps310_t *dps310, uint8_t startReg, uint8_t data[], size_t len);
 bool dps310_read_block(const dps310_t *dps310, uint8_t startReg, uint8_t data[], size_t len);
 
-static inline bool dps310_set_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t value);
-static inline bool dps310_read_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t *value);
+bool dps310_set_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t value);
+bool dps310_read_mask(const dps310_t *dps310, uint8_t reg, uint8_t mask, uint8_t *value);
 
 bool dps310_temp_bit_shift(const dps310_t *dps310, bool shift);
 bool dps310_pres_bit_shift(const dps310_t *dps310, bool shift);
 
-static inline bool dps310_set_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool value);
-static inline bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool *value);
+bool dps310_set_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool value);
+bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t mask, bool *value);
 
-static inline int32_t dps310_read_s24(const uint8_t *buf);
+int32_t dps310_read_s24(const uint8_t *buf);
 
-static inline float dps310_compensate_pres(const dps310_t *dps310, float presRawSc,
+float dps310_compensate_pres(const dps310_t *dps310, float presRawSc,
                                            float tempRawSc);
 
-static inline float dps310_compensate_temp(const dps310_t *dps310, float tempRawSc);
+float dps310_compensate_temp(const dps310_t *dps310, float tempRawSc);
 
-static inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t oversample);
+dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t oversample);
 
-static inline int32_t dps310_sign_extend(uint32_t value, int bits);
+int32_t dps310_sign_extend(uint32_t value, int bits);
 
 #endif
