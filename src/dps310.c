@@ -166,18 +166,20 @@ bool dps310_read_pres_calibration(dps310_t *dps310) {
     if (!dps310_read_block(dps310, DPS310_C00_HB, buffer, DPS310_PRES_COEF_REG_QNTY))
         return false;
 
-    uint32_t c00, c10;
+    uint32_t c00Raw, c10Raw;
+    int32_t c00, c10;
+
     uint16_t c01, c11, c20, c21, c30;
 
-    c00 = ((uint32_t)buffer[DPS310_C00_HB_I] << 12);
-    c00 |= ((uint32_t)buffer[DPS310_C00_MB_I] << 4);
-    c00 |= ((buffer[DPS310_C00_LB_C10_HB_I] & DPS310_C00_LB_MASK) >> 4);
-    c00 = dps310_sign_extend(c00, 20);
+    c00Raw = ((uint32_t)buffer[DPS310_C00_HB_I] << 12);
+    c00Raw |= ((uint32_t)buffer[DPS310_C00_MB_I] << 4);
+    c00Raw |= ((buffer[DPS310_C00_LB_C10_HB_I] & DPS310_C00_LB_MASK) >> 4);
+    c00 = dps310_sign_extend(c00Raw, 20);
 
-    c10 = ((uint32_t)buffer[DPS310_C00_LB_C10_HB_I] & DPS310_C10_HB_MASK) << 16;
-    c10 |= ((uint32_t)buffer[DPS310_C10_MB_I] << 8);
-    c10 |= buffer[DPS310_C10_LB_I];
-    c10 = dps310_sign_extend(c10, 20);
+    c10Raw = ((uint32_t)buffer[DPS310_C00_LB_C10_HB_I] & DPS310_C10_HB_MASK) << 16;
+    c10Raw |= ((uint32_t)buffer[DPS310_C10_MB_I] << 8);
+    c10Raw |= buffer[DPS310_C10_LB_I];
+    c10 = dps310_sign_extend(c10Raw, 20);
 
     c01 = ((uint16_t)buffer[DPS310_C01_HB_I] << 8);
     c01 |= buffer[DPS310_C01_LB_I];
@@ -196,10 +198,12 @@ bool dps310_read_pres_calibration(dps310_t *dps310) {
 
     dps310->presCoef.c00 = c00;
     dps310->presCoef.c10 = c10;
-    dps310->presCoef.c01 = c01;
-    dps310->presCoef.c11 = c11;
-    dps310->presCoef.c20 = c20;
-    dps310->presCoef.c30 = c30;
+
+    dps310->presCoef.c01 = (int16_t)c01;
+    dps310->presCoef.c11 = (int16_t)c11;
+    dps310->presCoef.c20 = (int16_t)c20;
+    dps310->presCoef.c21 = (int16_t)c21;
+    dps310->presCoef.c30 = (int16_t)c30;
     dps310->presCoef.read = true;
 
     return true;
@@ -217,17 +221,18 @@ bool dps310_read_temp_calibration(dps310_t *dps310) {
     if (!dps310_read_block(dps310, DPS310_C0_HB, buffer, DPS310_TEMP_COEF_REG_QNTY))
         return false;
 
-    uint16_t c0, c1;
+    uint16_t c0Raw, c1Raw;
+    int16_t c0, c1;
 
-    c0 = ((uint16_t)buffer[DPS310_C0_HB_I] << 4);
-    c0 |= ((buffer[DPS310_C0_LB_C1_HB_I] & DPS310_C0_LB_MASK) >> 4);
+    c0Raw = ((uint16_t)buffer[DPS310_C0_HB_I] << 4);
+    c0Raw |= ((buffer[DPS310_C0_LB_C1_HB_I] & DPS310_C0_LB_MASK) >> 4);
 
-    c1 = ((uint16_t)buffer[DPS310_C0_LB_C1_HB_I] & DPS310_C1_HB_MASK) << 8;
-    c1 |= (buffer[DPS310_C1_LB_I]);
+    c1Raw = ((uint16_t)buffer[DPS310_C0_LB_C1_HB_I] & DPS310_C1_HB_MASK) << 8;
+    c1Raw |= (buffer[DPS310_C1_LB_I]);
 
-    c0 = dps310_sign_extend(c0, 12);
+    c0 = (int16_t)dps310_sign_extend(c0Raw, 12);
 
-    c1 = dps310_sign_extend(c1, 12);
+    c1 = (int16_t)dps310_sign_extend(c1Raw, 12);
 
     dps310->tempCoef.c0Half = c0 / 2.0f;
     dps310->tempCoef.c1 = c1;
@@ -822,20 +827,21 @@ static inline bool dps310_read_bit(const dps310_t *dps310, uint8_t reg, uint8_t 
 
 static inline int32_t dps310_read_s24(const uint8_t *buf) {
     uint32_t raw;
+    int32_t rawInt;
 
     raw = ((uint32_t)buf[0] << 16);
     raw |= ((uint32_t)buf[1] << 8);
     raw |= ((uint32_t)buf[2]);
 
-    raw = dps310_sign_extend(raw, 24);
+    rawInt = dps310_sign_extend(raw, 24);
 
-    return (int32_t)raw;
+    return rawInt;
 }
 
 static inline float dps310_compensate_pres(const dps310_t *dps310, float presRawSc,
                                            float tempRawSc) {
-    return dps310->presCoef.c00 +
-           presRawSc * (dps310->presCoef.c10 +
+    return (float)dps310->presCoef.c00 +
+           presRawSc * ((float)dps310->presCoef.c10 +
                         presRawSc * (dps310->presCoef.c20 + presRawSc * dps310->presCoef.c30)) +
            tempRawSc * dps310->presCoef.c01 +
            tempRawSc * presRawSc * (dps310->presCoef.c11 + presRawSc * dps310->presCoef.c21);
@@ -869,8 +875,9 @@ static inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t o
     }
 }
 
-static inline int dps310_sign_extend(int value, int bits) {
-    if (value & (1 << (bits - 1)))
-        value -= (1 << bits);
-    return value;
+static inline int32_t dps310_sign_extend(uint32_t value, int bits) {
+    if (value & (1U << (bits - 1))) {
+        value |= ~((1U << bits) - 1); // llena los bits altos con 1
+    }
+    return (int32_t)value;
 }

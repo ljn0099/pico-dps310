@@ -328,6 +328,6 @@ static inline float dps310_compensate_temp(const dps310_t *dps310, float tempRaw
 
 static inline dps310_OversamplingSf_t oversampling_to_sf(dps310_Oversampling_t oversample);
 
-static inline int dps310_sign_extend(int value, int bits);
+static inline int32_t dps310_sign_extend(uint32_t value, int bits);
 
 #endif
