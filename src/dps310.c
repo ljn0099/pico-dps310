@@ -742,7 +742,7 @@ bool dps310_write_block(const dps310_t *dps310, uint8_t startReg, uint8_t data[]
     buffer[0] = startReg;
     memcpy(&buffer[1], data, len);
 
-    if (i2c_write_blocking(dps310->i2c, dps310->i2cAddress, buffer, len + 1, false) != len + 1)
+    if (i2c_write_blocking(dps310->i2c, dps310->i2cAddress, buffer, len + 1, false) != (int)(len + 1))
         return false;
 
     return true;
@@ -757,7 +757,7 @@ bool dps310_read_block(const dps310_t *dps310, uint8_t startReg, uint8_t data[],
     if (i2c_write_blocking(dps310->i2c, dps310->i2cAddress, &startReg, 1, true) != 1)
         return false;
 
-    if (i2c_read_blocking(dps310->i2c, dps310->i2cAddress, buffer, len, false) != len)
+    if (i2c_read_blocking(dps310->i2c, dps310->i2cAddress, buffer, len, false) != (int)(len))
         return false;
 
     memcpy(data, buffer, len);
